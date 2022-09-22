@@ -20,7 +20,9 @@ func main() {
 
 	app.Get("/ping", pingController.Index)
 
-	//app.Get("/user/:id", userController.Show)
+	app.Get("/user", userController.Show)
+	app.Get("/user/:id", userController.Show)
+
 	app.Post("/user", userController.Create)
 	app.Put("/user/:id", userController.Update)
 	app.Delete("/user/:id", userController.Delete)

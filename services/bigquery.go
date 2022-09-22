@@ -3,18 +3,18 @@ package bigquery
 import (
 	"cloud.google.com/go/bigquery"
 	"context"
-	"fmt"
-	"golangApiRest/models"
-	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 	"log"
 	"os"
 )
 
-func RunSql(sqlString string) {
+func RunSql(sqlString string) *bigquery.RowIterator {
 	ctx := context.Background()
 
-	client, err := bigquery.NewClient(ctx, os.Getenv("BIGQUERY_PROJECT_ID"), option.WithCredentialsFile(os.Getenv("GOOGLE_CLOUD_KEY")))
+	client, err := bigquery.NewClient(
+		ctx,
+		os.Getenv("BIGQUERY_PROJECT_ID"),
+		option.WithCredentialsFile(os.Getenv("GOOGLE_CLOUD_KEY")))
 
 	if err != nil {
 		log.Fatalf("bigquery.NewClient: %v", err)
@@ -26,32 +26,12 @@ func RunSql(sqlString string) {
 		}
 	}(client)
 
-	_, err = query(ctx, client, sqlString)
+	query := client.Query(sqlString)
+	rows, err := query.Read(ctx)
 
 	if err != nil {
 		log.Fatalf("bigquery.NewClient: %v", err)
 	}
-}
 
-func query(ctx context.Context, client *bigquery.Client, sqlString string) (*bigquery.RowIterator, error) {
-	query := client.Query(sqlString)
-	return query.Read(ctx)
-}
-
-func printValues(rows *bigquery.RowIterator) {
-	for {
-		var vals models.User
-
-		err := rows.Next(&vals)
-
-		if err == iterator.Done {
-			break
-		}
-
-		if err != nil {
-			log.Fatalf("bigquery.NewClient: %v", err)
-		}
-
-		fmt.Println(vals)
-	}
+	return rows
 }

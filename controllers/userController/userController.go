@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"golangApiRest/models"
 	bigqueryService "golangApiRest/services"
+	"google.golang.org/api/iterator"
 	"log"
 	"time"
 )
@@ -15,13 +16,35 @@ var DatasetId = "golangApiRest"
 var TableId = "users"
 
 func Show(c *fiber.Ctx) error {
-	var user models.User
+	var id string
 
-	id := c.Params("id")
+	if len(c.Params("id")) > 0 {
+		id = c.Params("id")
+	} else {
+		id = ""
+	}
 
-	bigqueryService.RunSql(buildSelectForBigquery(id))
+	rows := bigqueryService.RunSql(buildSelectForBigquery(id))
 
-	return c.Status(fiber.StatusOK).JSON(&user)
+	var users []models.User
+
+	for {
+		var user models.User
+
+		err := rows.Next(&user)
+
+		if err == iterator.Done {
+			break
+		}
+
+		if err != nil {
+			log.Fatalf("bigquery.Next: %v", err)
+		}
+
+		users = append(users, user)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(&users)
 }
 
 func Create(c *fiber.Ctx) error {
@@ -75,9 +98,17 @@ func Delete(c *fiber.Ctx) error {
 }
 
 func buildSelectForBigquery(id string) string {
-	queryString := fmt.Sprintf(
-		`Select * FROM %s.%s WHERE id = "%s"`,
-		DatasetId, TableId, id)
+	var queryString string
+
+	if len(id) > 0 {
+		queryString = fmt.Sprintf(
+			`Select * FROM %s.%s WHERE id = "%s"`,
+			DatasetId, TableId, id)
+	} else {
+		queryString = fmt.Sprintf(
+			`Select * FROM %s.%s WHERE id is not null`,
+			DatasetId, TableId)
+	}
 
 	return queryString
 }
