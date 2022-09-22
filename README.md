@@ -28,7 +28,7 @@
 ## API Reference
 
 #### Monitoring point
-```http
+```
   GET /ping
 ```
 
