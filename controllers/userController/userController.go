@@ -76,9 +76,7 @@ func Update(c *fiber.Ctx) error {
 	}
 
 	timeNow := time.Now()
-
 	user.Id = c.Params("id")
-	user.Updated = civil.DateTimeOf(timeNow)
 
 	bigqueryStruct := googleService.BuildBigQuerySql(googleIamKey, projectId, buildUpdateForBigquery(user, timeNow))
 	googleService.SendToBigQuery(bigqueryStruct)
