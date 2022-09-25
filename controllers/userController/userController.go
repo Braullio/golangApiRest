@@ -26,7 +26,7 @@ func Show(c *fiber.Ctx) error {
 		id = ""
 	}
 
-	rows := googleService.BigqueryRunSql(buildSelectForBigquery(id))
+	rows := googleService.RunSqlInBigQuery(buildSelectForBigquery(id))
 
 	var users []models.User
 
@@ -76,7 +76,7 @@ func Create(c *fiber.Ctx) error {
 	user.Created = civil.DateTimeOf(timeNow)
 	user.Updated = civil.DateTimeOf(timeNow)
 
-	googleService.BigqueryRunSql(buildInsertForBigquery(user, timeNow))
+	googleService.RunSqlInBigQuery(buildInsertForBigquery(user, timeNow))
 
 	return c.Status(fiber.StatusCreated).JSON(&user)
 }
@@ -95,7 +95,7 @@ func Update(c *fiber.Ctx) error {
 	timeNow := time.Now()
 	user.Updated = civil.DateTimeOf(timeNow)
 
-	googleService.BigqueryRunSql(buildUpdateForBigquery(id, user, timeNow))
+	googleService.RunSqlInBigQuery(buildUpdateForBigquery(id, user, timeNow))
 
 	return c.SendStatus(fiber.StatusOK)
 }
@@ -104,7 +104,7 @@ func Delete(c *fiber.Ctx) error {
 
 	id := c.Params("id")
 
-	googleService.BigqueryRunSql(buildDeleteForBigquery(id))
+	googleService.RunSqlInBigQuery(buildDeleteForBigquery(id))
 
 	return c.SendStatus(fiber.StatusOK)
 }

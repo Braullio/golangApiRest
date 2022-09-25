@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-func BigqueryRunSql(sqlString string) *bigquery.RowIterator {
+func RunSqlInBigQuery(sqlString string) *bigquery.RowIterator {
 	ctx := context.Background()
 
 	client, err := bigquery.NewClient(

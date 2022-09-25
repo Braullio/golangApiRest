@@ -15,7 +15,7 @@ func Teste(c *fiber.Ctx) error {
 	chat := os.Getenv("BIGQUERY_PROJECT_ID")
 	text := "teste"
 
-	googleService.ChatNotfication(chat, text)
+	googleService.NotficationInChat(chat, text)
 
 	return c.SendStatus(fiber.StatusOK)
 }
