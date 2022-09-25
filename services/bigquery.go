@@ -30,7 +30,7 @@ func RunSql(sqlString string) *bigquery.RowIterator {
 	rows, err := query.Read(ctx)
 
 	if err != nil {
-		log.Fatalf("bigquery.NewClient: %v", err)
+		log.Fatalf("bigquery: %v", err)
 	}
 
 	return rows
