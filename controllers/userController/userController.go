@@ -8,7 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"golangApiRest/models"
-	bigqueryService "golangApiRest/services"
+	"golangApiRest/services/googleService"
 	"google.golang.org/api/iterator"
 	"log"
 	"time"
@@ -26,7 +26,7 @@ func Show(c *fiber.Ctx) error {
 		id = ""
 	}
 
-	rows := bigqueryService.RunSql(buildSelectForBigquery(id))
+	rows := googleService.RunSqlInBigQuery(buildSelectForBigquery(id))
 
 	var users []models.User
 
@@ -76,7 +76,7 @@ func Create(c *fiber.Ctx) error {
 	user.Created = civil.DateTimeOf(timeNow)
 	user.Updated = civil.DateTimeOf(timeNow)
 
-	bigqueryService.RunSql(buildInsertForBigquery(user, timeNow))
+	googleService.RunSqlInBigQuery(buildInsertForBigquery(user, timeNow))
 
 	return c.Status(fiber.StatusCreated).JSON(&user)
 }
@@ -95,16 +95,21 @@ func Update(c *fiber.Ctx) error {
 	timeNow := time.Now()
 	user.Updated = civil.DateTimeOf(timeNow)
 
-	bigqueryService.RunSql(buildUpdateForBigquery(id, user, timeNow))
+	googleService.RunSqlInBigQuery(buildUpdateForBigquery(id, user, timeNow))
 
 	return c.SendStatus(fiber.StatusOK)
 }
 
 func Delete(c *fiber.Ctx) error {
+	var chat models.Chat
 
 	id := c.Params("id")
 
-	bigqueryService.RunSql(buildDeleteForBigquery(id))
+	googleService.RunSqlInBigQuery(buildDeleteForBigquery(id))
+
+	chat.Text = fmt.Sprintf("[GoLangApiRest] Efetuado a deleção do id: %s", id)
+
+	googleService.NotficationInChat(chat)
 
 	return c.SendStatus(fiber.StatusOK)
 }
