@@ -68,7 +68,7 @@ Name: users
   Content-Type: application/json
 
   {
-    "name": "Testenildo",
+    "name": "Testenildos",
     "phone" : "5562981919191",
     "status": "Registred"
   }
