@@ -17,7 +17,7 @@ func RunSqlInBigQuery(sqlString string) *bigquery.RowIterator {
 		option.WithCredentialsFile(os.Getenv("GOOGLE_CLOUD_KEY")))
 
 	if err != nil {
-		log.Fatalf("bigquery.NewClient: %v", err)
+		log.Fatalf("google.bigquery.NewClient: %v", err)
 	}
 
 	defer func(client *bigquery.Client) {
@@ -30,7 +30,7 @@ func RunSqlInBigQuery(sqlString string) *bigquery.RowIterator {
 	rows, err := query.Read(ctx)
 
 	if err != nil {
-		log.Fatalf("bigquery: %v", err)
+		log.Fatalf("google.bigquery: %v", err)
 	}
 
 	return rows

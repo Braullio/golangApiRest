@@ -19,7 +19,6 @@ func main() {
 	app := fiber.New()
 
 	app.Get("/ping", pingController.Index)
-	app.Get("/teste", pingController.Teste)
 
 	app.Get("/user", userController.Show)
 	app.Get("/user/:id", userController.Show)

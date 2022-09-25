@@ -101,10 +101,15 @@ func Update(c *fiber.Ctx) error {
 }
 
 func Delete(c *fiber.Ctx) error {
+	var chat models.Chat
 
 	id := c.Params("id")
 
 	googleService.RunSqlInBigQuery(buildDeleteForBigquery(id))
+
+	chat.Text = fmt.Sprintf("[GoLangApiRest] Efetuado a deleção do id: %s", id)
+
+	googleService.NotficationInChat(chat)
 
 	return c.SendStatus(fiber.StatusOK)
 }
