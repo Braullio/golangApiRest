@@ -223,7 +223,7 @@ AutoMigrate: true <br>
 ![So](https://img.shields.io/badge/Report-Google_Chat_Webhook-red.svg)
 <br>
 
-#### -- *List User*
+#### -- *List Product*
 *Request*
 ```http
   GET http://localhost:8001/product/:id
@@ -270,7 +270,7 @@ AutoMigrate: true <br>
 ![So](https://img.shields.io/badge/Report-Google_Chat_Webhook-red.svg)
 <br>
 
-#### -- *Update User*
+#### -- *Update Product*
 *Request*
 ```http 
   PUT http://localhost:8001/product/:id
@@ -294,7 +294,7 @@ AutoMigrate: true <br>
 ![So](https://img.shields.io/badge/Report-Google_Chat_Webhook-red.svg)
 <br>
 
-#### -- *Delete User*
+#### -- *Delete Product*
 *Request*
 ```http request
   DELETE http://localhost:8001/product/:id
