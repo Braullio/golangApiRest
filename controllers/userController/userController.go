@@ -43,13 +43,13 @@ func Show(c *fiber.Ctx) error {
 			log.Fatalf("bigquery.Next: %v", err)
 		}
 
-		valuesToCredit(row, &users)
+		setAtributesInUser(row, &users)
 	}
 
 	return c.Status(fiber.StatusOK).JSON(&users)
 }
 
-func valuesToCredit(values map[string]bigquery.Value, users *[]models.User) {
+func setAtributesInUser(values map[string]bigquery.Value, users *[]models.User) {
 	var user models.User
 	user.Id = values["id"].(string)
 	user.Name = values["name"].(string)
