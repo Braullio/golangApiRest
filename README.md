@@ -59,6 +59,7 @@ Name: users
     "msg": "pong"
   }
 ```
+![So](https://img.shields.io/badge/Report_In_Google_Chat_Webhook-false-red.svg)
 <br>
 
 ### # User point's
@@ -86,6 +87,7 @@ Name: users
       "updated_at": "2022-09-24T23:01:15.748503488"
   }
 ```
+![So](https://img.shields.io/badge/Report_In_Google_Chat_Webhook-false-red.svg)
 <br>
 
 #### -- *List User*
@@ -107,6 +109,8 @@ Name: users
     }
   ]
 ```
+![So](https://img.shields.io/badge/Report_In_Google_Chat_Webhook-false-red.svg)
+
 *Request*
 ```http
   GET http://localhost:8001/user
@@ -141,6 +145,7 @@ Name: users
     }
   ]
 ```
+![So](https://img.shields.io/badge/Report_In_Google_Chat_Webhook-false-red.svg)
 <br>
 
 #### -- *Update User*
@@ -157,6 +162,7 @@ Name: users
 ```http
   ### Status code: 200
 ```
+![So](https://img.shields.io/badge/Report_In_Google_Chat_Webhook-false-red.svg)
 <br>
 
 #### -- *Delete User*
@@ -169,7 +175,7 @@ Name: users
 ```http
   ### Status code: 200
 ```
-** *Report delete in google chat vi webhook* ** 
+![So](https://img.shields.io/badge/Report_In_Google_Chat_Webhook-OK-success.svg)
 
 ## License
 
