@@ -15,13 +15,20 @@ import (
 	"time"
 )
 
-var GoogleChatWebhook = os.Getenv("GOOGLE_CHAT_WEBHOOK")
-var GoogleIamKey = os.Getenv("GOOGLE_IAM_KEY")
-var ProjectId = os.Getenv("BIGQUERY_PROJECT_ID")
 var DatasetId = "golangApiRest"
 var TableId = "users"
 
+func envValues() (string, string, string) {
+	GoogleChatWebhook := os.Getenv("GOOGLE_CHAT_WEBHOOK")
+	GoogleIamKey := os.Getenv("GOOGLE_IAM_KEY")
+	ProjectId := os.Getenv("BIGQUERY_PROJECT_ID")
+
+	return GoogleChatWebhook, GoogleIamKey, ProjectId
+}
+
 func Show(c *fiber.Ctx) error {
+	_, googleIamKey, projectId := envValues()
+
 	var id string
 
 	if len(c.Params("id")) > 0 {
@@ -30,13 +37,15 @@ func Show(c *fiber.Ctx) error {
 		id = ""
 	}
 
-	bigqueryStruct := googleService.BuildBigQuerySql(GoogleIamKey, ProjectId, buildSelectForBigquery(id))
+	bigqueryStruct := googleService.BuildBigQuerySql(googleIamKey, projectId, buildSelectForBigquery(id))
 	usersStruct := buildUsersToResponse(googleService.SendToBigQuery(bigqueryStruct))
 
 	return c.Status(fiber.StatusOK).JSON(&usersStruct)
 }
 
 func Create(c *fiber.Ctx) error {
+	_, googleIamKey, projectId := envValues()
+
 	var user models.User
 
 	err := json.Unmarshal(c.Body(), &user)
@@ -50,13 +59,15 @@ func Create(c *fiber.Ctx) error {
 	user.Created = civil.DateTimeOf(timeNow)
 	user.Updated = civil.DateTimeOf(timeNow)
 
-	bigqueryStruct := googleService.BuildBigQuerySql(GoogleIamKey, ProjectId, buildInsertForBigquery(user, timeNow))
+	bigqueryStruct := googleService.BuildBigQuerySql(googleIamKey, projectId, buildInsertForBigquery(user, timeNow))
 	googleService.SendToBigQuery(bigqueryStruct)
 
 	return c.Status(fiber.StatusCreated).JSON(&user)
 }
 
 func Update(c *fiber.Ctx) error {
+	_, googleIamKey, projectId := envValues()
+
 	var user models.User
 
 	err := json.Unmarshal(c.Body(), &user)
@@ -69,20 +80,22 @@ func Update(c *fiber.Ctx) error {
 	user.Id = c.Params("id")
 	user.Updated = civil.DateTimeOf(timeNow)
 
-	bigqueryStruct := googleService.BuildBigQuerySql(GoogleIamKey, ProjectId, buildUpdateForBigquery(user, timeNow))
+	bigqueryStruct := googleService.BuildBigQuerySql(googleIamKey, projectId, buildUpdateForBigquery(user, timeNow))
 	googleService.SendToBigQuery(bigqueryStruct)
 
 	return c.SendStatus(fiber.StatusOK)
 }
 
 func Delete(c *fiber.Ctx) error {
+	googleChatWebhook, googleIamKey, projectId := envValues()
+
 	id := c.Params("id")
 
-	bigqueryStruct := googleService.BuildBigQuerySql(GoogleIamKey, ProjectId, buildDeleteForBigquery(id))
+	bigqueryStruct := googleService.BuildBigQuerySql(googleIamKey, projectId, buildDeleteForBigquery(id))
 	googleService.SendToBigQuery(bigqueryStruct)
 
 	chatStruct := googleService.BuildChatSimpleMessage(
-		GoogleChatWebhook,
+		googleChatWebhook,
 		fmt.Sprintf("[GoLangApiRest] Efetuado a deleção do id: %s", id),
 	)
 
