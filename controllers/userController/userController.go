@@ -1,6 +1,8 @@
 package userController
 
 import (
+	"cloud.google.com/go/bigquery"
+	"cloud.google.com/go/civil"
 	"encoding/json"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
@@ -28,10 +30,10 @@ func Show(c *fiber.Ctx) error {
 
 	var users []models.User
 
-	for {
-		var user models.User
+	row := make(map[string]bigquery.Value)
 
-		err := rows.Next(&user)
+	for {
+		err := rows.Next(&row)
 
 		if err == iterator.Done {
 			break
@@ -41,10 +43,22 @@ func Show(c *fiber.Ctx) error {
 			log.Fatalf("bigquery.Next: %v", err)
 		}
 
-		users = append(users, user)
+		valuesToCredit(row, &users)
 	}
 
 	return c.Status(fiber.StatusOK).JSON(&users)
+}
+
+func valuesToCredit(values map[string]bigquery.Value, users *[]models.User) {
+	var user models.User
+	user.Id = values["id"].(string)
+	user.Name = values["name"].(string)
+	user.Phone = values["phone"].(string)
+	user.Status = values["status"].(string)
+	user.Created = values["updated_at"].(civil.DateTime)
+	user.Updated = values["created_at"].(civil.DateTime)
+
+	*users = append(*users, user)
 }
 
 func Create(c *fiber.Ctx) error {
@@ -56,15 +70,13 @@ func Create(c *fiber.Ctx) error {
 		log.Fatalln(err)
 	}
 
-	timeNow := time.Now()
-
 	user.Id = uuid.New().String()
-	user.Created = timeNow.Format("2006-01-02 15:04:05")
-	user.Updated = timeNow.Format("2006-01-02 15:04:05")
-	user.CreatedTime = timeNow
-	user.UpdatedTime = timeNow
 
-	bigqueryService.RunSql(buildInsertForBigquery(user))
+	timeNow := time.Now()
+	user.Created = civil.DateTimeOf(timeNow)
+	user.Updated = civil.DateTimeOf(timeNow)
+
+	bigqueryService.RunSql(buildInsertForBigquery(user, timeNow))
 
 	return c.Status(fiber.StatusCreated).JSON(&user)
 }
@@ -81,9 +93,9 @@ func Update(c *fiber.Ctx) error {
 	id := c.Params("id")
 
 	timeNow := time.Now()
-	user.Updated = timeNow.Format("2006-01-02 15:04:05")
+	user.Updated = civil.DateTimeOf(timeNow)
 
-	bigqueryService.RunSql(buildUpdateForBigquery(id, user))
+	bigqueryService.RunSql(buildUpdateForBigquery(id, user, timeNow))
 
 	return c.SendStatus(fiber.StatusOK)
 }
@@ -113,19 +125,19 @@ func buildSelectForBigquery(id string) string {
 	return queryString
 }
 
-func buildInsertForBigquery(user models.User) string {
+func buildInsertForBigquery(user models.User, timeNow time.Time) string {
 	queryString := fmt.Sprintf(
 		`INSERT INTO  %s.%s (id, status, name, phone, created_at, updated_at) VALUES ( "%s","%s","%s","%s","%s","%s")`,
 		DatasetId, TableId,
-		user.Id, user.Status, user.Name, user.Phone, user.Created, user.Updated)
+		user.Id, user.Status, user.Name, user.Phone, timeNow.Format("2006-01-02 15:04:05"), timeNow.Format("2006-01-02 15:04:05"))
 
 	return queryString
 }
 
-func buildUpdateForBigquery(id string, user models.User) string {
+func buildUpdateForBigquery(id string, user models.User, timeNow time.Time) string {
 	queryString := fmt.Sprintf(
 		`UPDATE %s.%s SET status = "%s", updated_at = "%s" WHERE id = "%s"`,
-		DatasetId, TableId, user.Status, user.Updated, id)
+		DatasetId, TableId, user.Status, timeNow.Format("2006-01-02 15:04:05"), id)
 
 	return queryString
 }

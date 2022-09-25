@@ -77,35 +77,70 @@ Name: users
 ```http
   ### Status code: 201
   {
-      "id": "dc53b354-2658-4719-af2d-1185b7304df4",
-      "name": "Testenildo",
+      "id": "b11b1522-cb7c-48b8-9b35-27ec3a343e34",
+      "name": "Testenildos",
       "phone": "5562981919191",
       "status": "Registred",
-      "created_at": "2022-09-22T16:12:59.425329621-03:00",
-      "updated_at": "2022-09-22T16:12:59.425329621-03:00"
+      "created_at": "2022-09-24T23:01:15.748503488",
+      "updated_at": "2022-09-24T23:01:15.748503488"
   }
 ```
 <br>
 
-[//]: # (TODO)
-[//]: # (#### -- *Search User*)
-[//]: # (*Request*)
-[//]: # (```http)
-[//]: # (  GET http://localhost:8001/user/:id)
-[//]: # (```)
-[//]: # (*Response*)
-[//]: # (```http)
-[//]: # (  ### Status code: 200)
-[//]: # (  {)
-[//]: # (    "id": "61404d0a-0000-492a-ba0b-e82f4535adbe",)
-[//]: # (    "name": "Testenildo",)
-[//]: # (    "phone" : "5562981919191",)
-[//]: # (    "status": "Registred",)
-[//]: # (    "created_at": "",)
-[//]: # (    "updated_at": "")
-[//]: # (  })
-[//]: # (```)
-[//]: # (<br>)
+#### -- *Search User*
+*Request*
+```http
+  GET http://localhost:8001/user/:id
+```
+*Response*
+```http
+  ### Status code: 200
+  [
+    {
+        "id": "c8b948cd-4172-40a1-924a-fe815214f659",
+        "name": "Testenildfffffo",
+        "phone": "5562981921119191",
+        "status": "Registr11ed",
+        "created_at": "2022-09-22T18:31:17",
+        "updated_at": "2022-09-22T18:31:17"
+    }
+  ]
+```
+*Request*
+```http
+  GET http://localhost:8001/user
+```
+*Response*
+```http
+  ### Status code: 200
+  [
+    {
+        "id": "c8b948cd-4172-40a1-924a-fe815214f659",
+        "name": "Testenildfffffo",
+        "phone": "5562981921119191",
+        "status": "Registr11ed",
+        "created_at": "2022-09-22T18:31:17",
+        "updated_at": "2022-09-22T18:31:17"
+    },
+    {
+        "id": "ac668339-beee-46e6-87c5-8a482e5d9d26",
+        "name": "Testenildo",
+        "phone": "5562981919191",
+        "status": "Registred",
+        "created_at": "2022-09-22T18:31:22",
+        "updated_at": "2022-09-22T18:31:22"
+    },
+    {
+        "id": "b11b1522-cb7c-48b8-9b35-27ec3a343e34",
+        "name": "Testenildos",
+        "phone": "5562981919191",
+        "status": "Registred",
+        "created_at": "2022-09-24T23:01:15",
+        "updated_at": "2022-09-24T23:01:15"
+    }
+  ]
+```
+<br>
 
 #### -- *Update User*
 *Request*
