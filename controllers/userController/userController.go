@@ -77,6 +77,9 @@ func Update(c *fiber.Ctx) error {
 
 	timeNow := time.Now()
 	user.Id = c.Params("id")
+	if len(user.Id) == 0 {
+		return c.SendStatus(fiber.StatusBadRequest)
+	}
 
 	bigqueryStruct := googleService.BuildBigQuerySql(googleIamKey, projectId, buildUpdateForBigquery(user, timeNow))
 	googleService.SendToBigQuery(bigqueryStruct)
@@ -88,6 +91,9 @@ func Delete(c *fiber.Ctx) error {
 	googleChatWebhook, googleIamKey, projectId := envValues()
 
 	id := c.Params("id")
+	if len(id) == 0 {
+		return c.SendStatus(fiber.StatusBadRequest)
+	}
 
 	bigqueryStruct := googleService.BuildBigQuerySql(googleIamKey, projectId, buildDeleteForBigquery(id))
 	googleService.SendToBigQuery(bigqueryStruct)
