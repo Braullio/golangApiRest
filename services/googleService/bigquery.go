@@ -1,4 +1,4 @@
-package bigquery
+package googleService
 
 import (
 	"cloud.google.com/go/bigquery"
@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-func RunSql(sqlString string) *bigquery.RowIterator {
+func BigqueryRunSql(sqlString string) *bigquery.RowIterator {
 	ctx := context.Background()
 
 	client, err := bigquery.NewClient(

@@ -28,6 +28,7 @@
 ```
   PROJECT_ID = "project-123456789"
   FILE_GOOGLE_CLOUD_KEY = "./security/bigquery_key.json"
+  GOOGLE_CHAT_WEBHOOK = "https://chat.googleapis.com/v1/spaces/AAAAgOxrNhU/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=zk3322S04VnWdHW9y_4Zsg62CUZP9HvIvy0000uJ1qo%3D"
 ```
 
 ## Tables
