@@ -58,14 +58,16 @@ AutoMigrate: false <br>
 Locate: Postgresql <br>
 Name: products <br>
 AutoMigrate: true <br>
+Soft Delete: deleted_at <br>
 
-| Column     | Type      |
-|------------|-----------|
-| id         | BIGINT    |
-| name       | TEXT      |
-| value      | NUMERIC   |
-| created_at | TIMESTAMP |
-| updated_at | TIMESTAMP |
+| Column      | Type      |
+|-------------|-----------|
+| id          | BIGINT    |
+| name        | TEXT      |
+| value       | NUMERIC   |
+| created_at  | TIMESTAMP |
+| updated_at  | TIMESTAMP |
+| deleted_at  | TIMESTAMP |
 
 ## API Reference
 
