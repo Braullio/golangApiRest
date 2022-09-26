@@ -100,7 +100,7 @@ func Update(c *fiber.Ctx) error {
 	timeNow := time.Now()
 	product.UpdatedAt = timeNow
 
-	errors := databaseService.DbConnect(postgresqlStruct).Updates(product)
+	errors := databaseService.DbConnect(postgresqlStruct).Updates(&product)
 	if errors.Error != nil {
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
@@ -117,7 +117,7 @@ func Delete(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
 
-	errors := databaseService.DbConnect(postgresqlStruct).Delete(product)
+	errors := databaseService.DbConnect(postgresqlStruct).Delete(&product)
 	if errors.Error != nil {
 		return c.SendStatus(fiber.StatusBadRequest)
 	}

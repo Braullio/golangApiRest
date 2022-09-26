@@ -294,7 +294,7 @@ AutoMigrate: true <br>
 ![So](https://img.shields.io/badge/Report-Google_Chat_Webhook-red.svg)
 <br>
 
-#### -- *Delete Product*
+#### -- *Delete Product [ Soft Delete ]*
 *Request*
 ```http request
   DELETE http://localhost:8001/product/:id
