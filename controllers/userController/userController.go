@@ -60,7 +60,7 @@ func Create(c *fiber.Ctx) error {
 	user.Updated = civil.DateTimeOf(timeNow)
 
 	bigqueryStruct := googleService.BuildBigQuerySql(googleIamKey, projectId, buildInsertForBigquery(user, timeNow))
-	googleService.SendToBigQuery(bigqueryStruct)
+	go googleService.SendToBigQuery(bigqueryStruct)
 
 	return c.Status(fiber.StatusCreated).JSON(&user)
 }
@@ -82,7 +82,7 @@ func Update(c *fiber.Ctx) error {
 	}
 
 	bigqueryStruct := googleService.BuildBigQuerySql(googleIamKey, projectId, buildUpdateForBigquery(user, timeNow))
-	googleService.SendToBigQuery(bigqueryStruct)
+	go googleService.SendToBigQuery(bigqueryStruct)
 
 	return c.SendStatus(fiber.StatusOK)
 }
@@ -96,14 +96,14 @@ func Delete(c *fiber.Ctx) error {
 	}
 
 	bigqueryStruct := googleService.BuildBigQuerySql(googleIamKey, projectId, buildDeleteForBigquery(id))
-	googleService.SendToBigQuery(bigqueryStruct)
+	go googleService.SendToBigQuery(bigqueryStruct)
 
 	chatStruct := googleService.BuildChatSimpleMessage(
 		googleChatWebhook,
 		fmt.Sprintf("[GoLangApiRest] Efetuado a deleção do id: %s", id),
 	)
 
-	googleService.SendToChat(chatStruct)
+	go googleService.SendToChat(chatStruct)
 
 	return c.SendStatus(fiber.StatusOK)
 }
