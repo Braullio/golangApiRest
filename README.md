@@ -3,10 +3,14 @@
 
 ![So](https://img.shields.io/badge/S.O.-Linux-informational.svg)
 ![Go Version](https://img.shields.io/badge/Go-v.1.18-informational.svg)
-![Database](https://img.shields.io/badge/Database-BigQuery-informational.svg)
 <br>
-![Repo Size](https://img.shields.io/badge/Repo_size-xxx_MB-informational.svg)
-![Exec Size](https://img.shields.io/badge/Exec_size-xxx_MB-informational.svg)
+![Database](https://img.shields.io/badge/Database-BigQuery-informational.svg)
+![Database](https://img.shields.io/badge/Database-Postgresql-informational.svg)
+<br>
+![Report](https://img.shields.io/badge/Report-Google_Chat-informational.svg)
+<br>
+![Repo Size](https://img.shields.io/badge/Repo_size-1,6_MB-informational.svg)
+![Exec Size](https://img.shields.io/badge/Exec_size-26_MB-informational.svg)
 <br>
 [![MIT License](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://choosealicense.com/licenses/mit/)
 
