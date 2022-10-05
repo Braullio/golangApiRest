@@ -67,6 +67,7 @@ func Create(c *fiber.Ctx) error {
 	postgresqlStruct := databaseService.BuildPostgresqlSql(host, user, password, dbname, port, sslmode, sslrootcert)
 	err := databaseService.DbConnect(postgresqlStruct).AutoMigrate(&models.Product{})
 	if err != nil {
+		log.Fatalln(err)
 		return err
 	}
 
