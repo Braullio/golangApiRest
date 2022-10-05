@@ -102,7 +102,7 @@ func Delete(c *fiber.Ctx) error {
 	go googleService.SendToChat(
 		googleService.BuildChatSimpleMessage(
 			GoogleChatWebhook,
-			buildMessageToChat(id),
+			fmt.Sprintf("[GoLangApiRest] ALERT\nEfetuado a deleção do id: %s", id),
 		),
 	)
 
@@ -134,10 +134,6 @@ func buildUsersToResponse(response *bigquery.RowIterator) []models.User {
 	}
 
 	return users
-}
-
-func buildMessageToChat(id string) string {
-	return fmt.Sprintf("[GoLangApiRest] ALERT\nEfetuado a deleção do id: %s", id)
 }
 
 func buildSelectForBigquery(id string) string {
