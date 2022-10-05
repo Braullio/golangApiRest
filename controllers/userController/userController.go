@@ -15,11 +15,11 @@ import (
 	"time"
 )
 
-var PROJECT_ID = os.Getenv("BIGQUERY_PROJECT_ID")
-var DATASET_ID = "golangApiRest"
-var TABLE_ID = "users"
-var GOOGLE_IAM_KEY = os.Getenv("GOOGLE_IAM_KEY")
-var GOOGLE_CHAT_WEBHOOK = os.Getenv("GOOGLE_CHAT_WEBHOOK")
+var ProjectId = os.Getenv("BIGQUERY_PROJECT_ID")
+var DatasetId = "golangApiRest"
+var TableId = "users"
+var GoogleIamKey = os.Getenv("GOOGLE_IAM_KEY")
+var GoogleChatWebhook = os.Getenv("GOOGLE_CHAT_WEBHOOK")
 
 func Show(c *fiber.Ctx) error {
 	var id string
@@ -33,8 +33,8 @@ func Show(c *fiber.Ctx) error {
 	usersStruct := buildUsersToResponse(
 		googleService.SendToBigQuery(
 			googleService.BuildBigQuerySql(
-				GOOGLE_IAM_KEY,
-				PROJECT_ID,
+				GoogleIamKey,
+				ProjectId,
 				buildSelectForBigquery(id),
 			),
 		),
@@ -59,8 +59,8 @@ func Create(c *fiber.Ctx) error {
 
 	go googleService.SendToBigQuery(
 		googleService.BuildBigQuerySql(
-			GOOGLE_IAM_KEY,
-			PROJECT_ID,
+			GoogleIamKey,
+			ProjectId,
 			buildInsertForBigquery(user, timeNow),
 		),
 	)
@@ -84,8 +84,8 @@ func Update(c *fiber.Ctx) error {
 
 	go googleService.SendToBigQuery(
 		googleService.BuildBigQuerySql(
-			GOOGLE_IAM_KEY,
-			PROJECT_ID,
+			GoogleIamKey,
+			ProjectId,
 			buildUpdateForBigquery(user, timeNow),
 		),
 	)
@@ -101,15 +101,15 @@ func Delete(c *fiber.Ctx) error {
 
 	go googleService.SendToBigQuery(
 		googleService.BuildBigQuerySql(
-			GOOGLE_IAM_KEY,
-			PROJECT_ID,
+			GoogleIamKey,
+			ProjectId,
 			buildDeleteForBigquery(id),
 		),
 	)
 
 	go googleService.SendToChat(
 		googleService.BuildChatSimpleMessage(
-			GOOGLE_CHAT_WEBHOOK,
+			GoogleChatWebhook,
 			buildMessageToChat(id),
 		),
 	)
@@ -154,11 +154,11 @@ func buildSelectForBigquery(id string) string {
 	if len(id) > 0 {
 		queryString = fmt.Sprintf(
 			`Select * FROM %s.%s WHERE id = "%s"`,
-			DATASET_ID, TABLE_ID, id)
+			DatasetId, TableId, id)
 	} else {
 		queryString = fmt.Sprintf(
 			`Select * FROM %s.%s WHERE id is not null`,
-			DATASET_ID, TABLE_ID)
+			DatasetId, TableId)
 	}
 
 	return queryString
@@ -167,7 +167,7 @@ func buildSelectForBigquery(id string) string {
 func buildInsertForBigquery(user models.User, timeNow time.Time) string {
 	queryString := fmt.Sprintf(
 		`INSERT INTO  %s.%s (id, status, name, phone, created_at, updated_at) VALUES ( "%s","%s","%s","%s","%s","%s")`,
-		DATASET_ID, TABLE_ID,
+		DatasetId, TableId,
 		user.Id, user.Status, user.Name, user.Phone, timeNow.Format("2006-01-02 15:04:05"), timeNow.Format("2006-01-02 15:04:05"))
 
 	return queryString
@@ -176,7 +176,7 @@ func buildInsertForBigquery(user models.User, timeNow time.Time) string {
 func buildUpdateForBigquery(user models.User, timeNow time.Time) string {
 	queryString := fmt.Sprintf(
 		`UPDATE %s.%s SET status = "%s", updated_at = "%s" WHERE id = "%s"`,
-		DATASET_ID, TABLE_ID, user.Status, timeNow.Format("2006-01-02 15:04:05"), user.Id)
+		DatasetId, TableId, user.Status, timeNow.Format("2006-01-02 15:04:05"), user.Id)
 
 	return queryString
 }
@@ -184,7 +184,7 @@ func buildUpdateForBigquery(user models.User, timeNow time.Time) string {
 func buildDeleteForBigquery(id string) string {
 	queryString := fmt.Sprintf(
 		`DELETE FROM %s.%s WHERE id = "%s"`,
-		DATASET_ID, TABLE_ID, id)
+		DatasetId, TableId, id)
 
 	return queryString
 }
