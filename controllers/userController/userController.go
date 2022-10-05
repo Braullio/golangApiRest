@@ -15,20 +15,13 @@ import (
 	"time"
 )
 
-var DatasetId = "golangApiRest"
-var TableId = "users"
-
-func envValues() (string, string, string) {
-	GoogleChatWebhook := os.Getenv("GOOGLE_CHAT_WEBHOOK")
-	GoogleIamKey := os.Getenv("GOOGLE_IAM_KEY")
-	ProjectId := os.Getenv("BIGQUERY_PROJECT_ID")
-
-	return GoogleChatWebhook, GoogleIamKey, ProjectId
-}
+var PROJECT_ID = os.Getenv("BIGQUERY_PROJECT_ID")
+var DATASET_ID = "golangApiRest"
+var TABLE_ID = "users"
+var GOOGLE_IAM_KEY = os.Getenv("GOOGLE_IAM_KEY")
+var GOOGLE_CHAT_WEBHOOK = os.Getenv("GOOGLE_CHAT_WEBHOOK")
 
 func Show(c *fiber.Ctx) error {
-	_, googleIamKey, projectId := envValues()
-
 	var id string
 
 	if len(c.Params("id")) > 0 {
@@ -40,8 +33,8 @@ func Show(c *fiber.Ctx) error {
 	usersStruct := buildUsersToResponse(
 		googleService.SendToBigQuery(
 			googleService.BuildBigQuerySql(
-				googleIamKey,
-				projectId,
+				GOOGLE_IAM_KEY,
+				PROJECT_ID,
 				buildSelectForBigquery(id),
 			),
 		),
@@ -51,8 +44,6 @@ func Show(c *fiber.Ctx) error {
 }
 
 func Create(c *fiber.Ctx) error {
-	_, googleIamKey, projectId := envValues()
-
 	var user models.User
 
 	err := json.Unmarshal(c.Body(), &user)
@@ -68,8 +59,8 @@ func Create(c *fiber.Ctx) error {
 
 	go googleService.SendToBigQuery(
 		googleService.BuildBigQuerySql(
-			googleIamKey,
-			projectId,
+			GOOGLE_IAM_KEY,
+			PROJECT_ID,
 			buildInsertForBigquery(user, timeNow),
 		),
 	)
@@ -78,8 +69,6 @@ func Create(c *fiber.Ctx) error {
 }
 
 func Update(c *fiber.Ctx) error {
-	_, googleIamKey, projectId := envValues()
-
 	var user models.User
 
 	err := json.Unmarshal(c.Body(), &user)
@@ -95,8 +84,8 @@ func Update(c *fiber.Ctx) error {
 
 	go googleService.SendToBigQuery(
 		googleService.BuildBigQuerySql(
-			googleIamKey,
-			projectId,
+			GOOGLE_IAM_KEY,
+			PROJECT_ID,
 			buildUpdateForBigquery(user, timeNow),
 		),
 	)
@@ -105,8 +94,6 @@ func Update(c *fiber.Ctx) error {
 }
 
 func Delete(c *fiber.Ctx) error {
-	googleChatWebhook, googleIamKey, projectId := envValues()
-
 	id := c.Params("id")
 	if len(id) == 0 {
 		return c.SendStatus(fiber.StatusBadRequest)
@@ -114,15 +101,15 @@ func Delete(c *fiber.Ctx) error {
 
 	go googleService.SendToBigQuery(
 		googleService.BuildBigQuerySql(
-			googleIamKey,
-			projectId,
+			GOOGLE_IAM_KEY,
+			PROJECT_ID,
 			buildDeleteForBigquery(id),
 		),
 	)
 
 	go googleService.SendToChat(
 		googleService.BuildChatSimpleMessage(
-			googleChatWebhook,
+			GOOGLE_CHAT_WEBHOOK,
 			buildMessageToChat(id),
 		),
 	)
@@ -167,11 +154,11 @@ func buildSelectForBigquery(id string) string {
 	if len(id) > 0 {
 		queryString = fmt.Sprintf(
 			`Select * FROM %s.%s WHERE id = "%s"`,
-			DatasetId, TableId, id)
+			DATASET_ID, TABLE_ID, id)
 	} else {
 		queryString = fmt.Sprintf(
 			`Select * FROM %s.%s WHERE id is not null`,
-			DatasetId, TableId)
+			DATASET_ID, TABLE_ID)
 	}
 
 	return queryString
@@ -180,7 +167,7 @@ func buildSelectForBigquery(id string) string {
 func buildInsertForBigquery(user models.User, timeNow time.Time) string {
 	queryString := fmt.Sprintf(
 		`INSERT INTO  %s.%s (id, status, name, phone, created_at, updated_at) VALUES ( "%s","%s","%s","%s","%s","%s")`,
-		DatasetId, TableId,
+		DATASET_ID, TABLE_ID,
 		user.Id, user.Status, user.Name, user.Phone, timeNow.Format("2006-01-02 15:04:05"), timeNow.Format("2006-01-02 15:04:05"))
 
 	return queryString
@@ -189,7 +176,7 @@ func buildInsertForBigquery(user models.User, timeNow time.Time) string {
 func buildUpdateForBigquery(user models.User, timeNow time.Time) string {
 	queryString := fmt.Sprintf(
 		`UPDATE %s.%s SET status = "%s", updated_at = "%s" WHERE id = "%s"`,
-		DatasetId, TableId, user.Status, timeNow.Format("2006-01-02 15:04:05"), user.Id)
+		DATASET_ID, TABLE_ID, user.Status, timeNow.Format("2006-01-02 15:04:05"), user.Id)
 
 	return queryString
 }
@@ -197,7 +184,7 @@ func buildUpdateForBigquery(user models.User, timeNow time.Time) string {
 func buildDeleteForBigquery(id string) string {
 	queryString := fmt.Sprintf(
 		`DELETE FROM %s.%s WHERE id = "%s"`,
-		DatasetId, TableId, id)
+		DATASET_ID, TABLE_ID, id)
 
 	return queryString
 }
