@@ -65,11 +65,14 @@ func Show(c *fiber.Ctx) error {
 func Create(c *fiber.Ctx) error {
 	host, user, password, dbname, port, sslmode, sslrootcert := envValues()
 	postgresqlStruct := databaseService.BuildPostgresqlSql(host, user, password, dbname, port, sslmode, sslrootcert)
-	databaseService.DbConnect(postgresqlStruct).AutoMigrate(&models.Product{})
+	err := databaseService.DbConnect(postgresqlStruct).AutoMigrate(&models.Product{})
+	if err != nil {
+		return err
+	}
 
 	var product models.Product
 
-	err := json.Unmarshal(c.Body(), &product)
+	err = json.Unmarshal(c.Body(), &product)
 	if err != nil {
 		log.Fatalln(err)
 	}
