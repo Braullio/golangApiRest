@@ -32,11 +32,9 @@ func Show(c *fiber.Ctx) error {
 
 	usersStruct := buildUsersToResponse(
 		googleService.SendToBigQuery(
-			googleService.BuildBigQuerySql(
-				GoogleIamKey,
-				ProjectId,
-				buildSelectForBigquery(id),
-			),
+			GoogleIamKey,
+			ProjectId,
+			buildSelectForBigquery(id),
 		),
 	)
 
@@ -58,11 +56,9 @@ func Create(c *fiber.Ctx) error {
 	user.Updated = civil.DateTimeOf(timeNow)
 
 	go googleService.SendToBigQuery(
-		googleService.BuildBigQuerySql(
-			GoogleIamKey,
-			ProjectId,
-			buildInsertForBigquery(user, timeNow),
-		),
+		GoogleIamKey,
+		ProjectId,
+		buildInsertForBigquery(user, timeNow),
 	)
 
 	return c.Status(fiber.StatusCreated).JSON(&user)
@@ -83,11 +79,9 @@ func Update(c *fiber.Ctx) error {
 	}
 
 	go googleService.SendToBigQuery(
-		googleService.BuildBigQuerySql(
-			GoogleIamKey,
-			ProjectId,
-			buildUpdateForBigquery(user, timeNow),
-		),
+		GoogleIamKey,
+		ProjectId,
+		buildUpdateForBigquery(user, timeNow),
 	)
 
 	return c.SendStatus(fiber.StatusOK)
@@ -100,11 +94,9 @@ func Delete(c *fiber.Ctx) error {
 	}
 
 	go googleService.SendToBigQuery(
-		googleService.BuildBigQuerySql(
-			GoogleIamKey,
-			ProjectId,
-			buildDeleteForBigquery(id),
-		),
+		GoogleIamKey,
+		ProjectId,
+		buildDeleteForBigquery(id),
 	)
 
 	go googleService.SendToChat(

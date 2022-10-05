@@ -7,24 +7,8 @@ import (
 	"log"
 )
 
-type BigQuery struct {
-	ProjectId    string
-	GoogleIamKey string
-	StringSql    string
-}
-
-func BuildBigQuerySql(googleIamKey string, projectId string, stringSql string) BigQuery {
-	var bigqueryStruct BigQuery
-
-	bigqueryStruct.GoogleIamKey = googleIamKey
-	bigqueryStruct.StringSql = stringSql
-	bigqueryStruct.ProjectId = projectId
-
-	return bigqueryStruct
-}
-
-func SendToBigQuery(bigqueryStruct BigQuery) *bigquery.RowIterator {
-	if len(bigqueryStruct.ProjectId) == 0 || len(bigqueryStruct.GoogleIamKey) == 0 || len(bigqueryStruct.StringSql) == 0 {
+func SendToBigQuery(googleIamKey string, projectId string, stringSql string) *bigquery.RowIterator {
+	if len(projectId) == 0 || len(googleIamKey) == 0 || len(stringSql) == 0 {
 		log.Fatalf("google.bigquery: Variables not valid")
 	}
 
@@ -32,8 +16,8 @@ func SendToBigQuery(bigqueryStruct BigQuery) *bigquery.RowIterator {
 
 	client, err := bigquery.NewClient(
 		ctx,
-		bigqueryStruct.ProjectId,
-		option.WithCredentialsFile(bigqueryStruct.GoogleIamKey))
+		projectId,
+		option.WithCredentialsFile(googleIamKey))
 
 	if err != nil {
 		log.Fatalf("google.bigquery.NewClient: %v", err)
@@ -45,7 +29,7 @@ func SendToBigQuery(bigqueryStruct BigQuery) *bigquery.RowIterator {
 		}
 	}(client)
 
-	query := client.Query(bigqueryStruct.StringSql)
+	query := client.Query(stringSql)
 	rows, err := query.Read(ctx)
 
 	if err != nil {
