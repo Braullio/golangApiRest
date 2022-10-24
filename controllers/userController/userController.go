@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"golangApiRest/models"
+	"golangApiRest/services/enumChat"
 	"golangApiRest/services/googleService"
 	"google.golang.org/api/iterator"
 	"log"
@@ -15,13 +16,21 @@ import (
 	"time"
 )
 
-var ProjectId = os.Getenv("BIGQUERY_PROJECT_ID")
 var DatasetId = "golangApiRest"
 var TableId = "users"
-var GoogleIamKey = os.Getenv("GOOGLE_IAM_KEY")
-var GoogleChatWebhook = os.Getenv("GOOGLE_CHAT_WEBHOOK")
+var attempt = 0
+
+func getEnv() (string, string, string) {
+	ProjectId := os.Getenv("BIGQUERY_PROJECT_ID")
+	GoogleIamKey := os.Getenv("GOOGLE_IAM_KEY")
+	GoogleChatWebhook := os.Getenv("GOOGLE_CHAT_WEBHOOK")
+
+	return ProjectId, GoogleIamKey, GoogleChatWebhook
+}
 
 func Show(c *fiber.Ctx) error {
+	ProjectId, GoogleIamKey, _ := getEnv()
+
 	var id string
 
 	if len(c.Params("id")) > 0 {
@@ -35,6 +44,7 @@ func Show(c *fiber.Ctx) error {
 			GoogleIamKey,
 			ProjectId,
 			buildSelectForBigquery(id),
+			attempt,
 		),
 	)
 
@@ -42,11 +52,24 @@ func Show(c *fiber.Ctx) error {
 }
 
 func Create(c *fiber.Ctx) error {
+	ProjectId, GoogleIamKey, GoogleChatWebhook := getEnv()
+
 	var user models.User
 
 	err := json.Unmarshal(c.Body(), &user)
 	if err != nil {
-		log.Fatalln(err)
+		go googleService.SendToChat(
+			googleService.BuildChatAlertMessage(
+				enumChat.Warning,
+				GoogleChatWebhook,
+				"userController.Create[ json.Unmarshal ]",
+				err.Error(),
+				"",
+				attempt,
+			),
+		)
+
+		return c.SendStatus(fiber.StatusBadRequest)
 	}
 
 	timeNow := time.Now()
@@ -59,17 +82,31 @@ func Create(c *fiber.Ctx) error {
 		GoogleIamKey,
 		ProjectId,
 		buildInsertForBigquery(user, timeNow),
+		attempt,
 	)
 
 	return c.Status(fiber.StatusCreated).JSON(&user)
 }
 
 func Update(c *fiber.Ctx) error {
+	ProjectId, GoogleIamKey, GoogleChatWebhook := getEnv()
+
 	var user models.User
 
 	err := json.Unmarshal(c.Body(), &user)
 	if err != nil {
-		log.Fatalln(err)
+		go googleService.SendToChat(
+			googleService.BuildChatAlertMessage(
+				enumChat.Warning,
+				GoogleChatWebhook,
+				"userController.Update[ json.Unmarshal ]",
+				err.Error(),
+				"",
+				attempt,
+			),
+		)
+
+		return c.SendStatus(fiber.StatusBadRequest)
 	}
 
 	timeNow := time.Now()
@@ -82,12 +119,15 @@ func Update(c *fiber.Ctx) error {
 		GoogleIamKey,
 		ProjectId,
 		buildUpdateForBigquery(user, timeNow),
+		attempt,
 	)
 
 	return c.SendStatus(fiber.StatusOK)
 }
 
 func Delete(c *fiber.Ctx) error {
+	ProjectId, GoogleIamKey, GoogleChatWebhook := getEnv()
+
 	id := c.Params("id")
 	if len(id) == 0 {
 		return c.SendStatus(fiber.StatusBadRequest)
@@ -97,12 +137,17 @@ func Delete(c *fiber.Ctx) error {
 		GoogleIamKey,
 		ProjectId,
 		buildDeleteForBigquery(id),
+		attempt,
 	)
 
 	go googleService.SendToChat(
-		googleService.BuildChatSimpleMessage(
+		googleService.BuildChatAlertMessage(
+			enumChat.Warning,
 			GoogleChatWebhook,
+			"userController.Update[ json.Unmarshal ]",
 			fmt.Sprintf("[GoLangApiRest] ALERT\nEfetuado a deleção do id: %s", id),
+			"",
+			attempt,
 		),
 	)
 
